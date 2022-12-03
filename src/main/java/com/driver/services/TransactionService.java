@@ -74,6 +74,7 @@ public class TransactionService {
 
        transactionRepository5.save(transaction); // saving it in the database table;
         book.setAvailable(false); // occupying the book
+        book.setCard(card);// setting the card id for the issued book
         bookRepository5.save(book);// saving the book details as occupiet or available=false
 
         // a book has list of transaction, so i am adding the transaction to the list;
@@ -113,6 +114,7 @@ public class TransactionService {
         //make the book available for other users
         Book b = transaction.getBook();
         b.setAvailable(true);
+        b.setCard(null);
         bookRepository5.save(b);
 
         return newTransaction; //return the transaction after updating all details

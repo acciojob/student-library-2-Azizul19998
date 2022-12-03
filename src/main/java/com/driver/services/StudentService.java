@@ -36,6 +36,7 @@ public class StudentService {
     public void createStudent(Student student){
         // creating a new card for the student by default
         Card card = new Card();
+        card.setStudent(student);
         cardRepository.save(card);
 
   // now link the card id to the student table;
