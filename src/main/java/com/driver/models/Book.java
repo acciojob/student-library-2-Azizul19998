@@ -44,5 +44,18 @@ public class Book {
 
     public Book() {
     }
+
+    public Book(String name, Genre genre, boolean available) {
+        this.name = name;
+        this.genre = genre;
+        this.available = available;
+    }
+
+    public Book(String name, Genre genre, boolean available, Author author) {
+        this.name = name;
+        this.genre = genre;
+        this.available = available;
+        this.author = author;
+    }
 }
 

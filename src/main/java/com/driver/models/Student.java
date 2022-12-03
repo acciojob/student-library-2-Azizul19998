@@ -60,5 +60,37 @@ public class Student {
     @JsonIgnoreProperties("student")
     private Card card;
 
+    public Student(String emailId, String name, int age, String country) {
+        this.emailId = emailId;
+        this.name = name;
+        this.age = age;
+        this.country = country;
+    }
 
+    public Student(String emailId, String name, int age, String country, Date createdOn, Date updatedOn) {
+        this.emailId = emailId;
+        this.name = name;
+        this.age = age;
+        this.country = country;
+        this.createdOn = createdOn;
+        this.updatedOn = updatedOn;
+    }
+
+    public Student(String emailId, String name, int age, String country, Date createdOn, Date updatedOn, Card card) {
+        this.emailId = emailId;
+        this.name = name;
+        this.age = age;
+        this.country = country;
+        this.createdOn = createdOn;
+        this.updatedOn = updatedOn;
+        this.card = card;
+    }
+
+    public Student(String emailId, String name, int age, String country, Card card) {
+        this.emailId = emailId;
+        this.name = name;
+        this.age = age;
+        this.country = country;
+        this.card = card;
+    }
 }
