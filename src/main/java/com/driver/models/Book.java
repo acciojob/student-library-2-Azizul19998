@@ -2,11 +2,17 @@ package com.driver.models;
 
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import lombok.*;
 
 import javax.persistence.*;
 import java.util.List;
 
 @Entity
+@Getter
+@Setter
+@Builder
+@AllArgsConstructor
+@Data
 public class Book {
 
     @Id
@@ -18,6 +24,10 @@ public class Book {
     @Enumerated(EnumType.STRING)
     private Genre genre;
 
+
+    @Column(columnDefinition = "TINYINT(1)")
+    private boolean available;
+
     @ManyToOne
     @JoinColumn
     @JsonIgnoreProperties("booksWritten")
@@ -27,10 +37,6 @@ public class Book {
     @JoinColumn
     @JsonIgnoreProperties("books")
     private Card card;
-
-
-    @Column(columnDefinition = "TINYINT(1)")
-    private boolean available;
 
     @OneToMany(mappedBy = "book", cascade = CascadeType.ALL)
     @JsonIgnoreProperties("book")

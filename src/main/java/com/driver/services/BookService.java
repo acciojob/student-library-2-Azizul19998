@@ -14,12 +14,19 @@ public class BookService {
     @Autowired
     BookRepository bookRepository2;
 
-    public void createBook(Book book){
+
+    public void createBook(Book book){ //book is a child of author and card
+        // while creating a new book I have to declare who is the author
+        //that meant i have to set the books in the author entity
+      //  book.
+
         bookRepository2.save(book);
     }
 
     public List<Book> getBooks(String genre, boolean available, String author){
-        List<Book> books = null; //find the elements of the list by yourself
+
+        List<Book> books = bookRepository2.findBooksByGenreAuthor(genre,author,available); //find the elements of the list by yourself
         return books;
     }
+
 }

@@ -1,5 +1,7 @@
 package com.driver.services;
 
+import com.driver.models.Book;
+import com.driver.models.Card;
 import com.driver.models.Transaction;
 import com.driver.models.TransactionStatus;
 import com.driver.repositories.BookRepository;
@@ -10,6 +12,10 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.UUID;
+
+import static java.time.temporal.ChronoUnit.DAYS;
+
 
 @Service
 public class TransactionService {
@@ -34,18 +40,48 @@ public class TransactionService {
 
     public String issueBook(int cardId, int bookId) throws Exception {
         //check whether bookId and cardId already exist
+        Book book = bookRepository5.findById(bookId).orElse(null); // checking book is present or not using the bookid
+        Card card = cardRepository5.findById(cardId).orElse(null); // checking card is present or not for the cardId
         //conditions required for successful transaction of issue book:
         //1. book is present and available
         // If it fails: throw new Exception("Book is either unavailable or not present");
+        if(book==null) {
+            throw new Exception("Book is either unavailable or not present");
+        }
         //2. card is present and activated
         // If it fails: throw new Exception("Card is invalid");
+        if(card==null) {
+            throw new Exception("Card is invalid");
+        }
+        if(card!=null) {
+            String status = String.valueOf(card.getCardStatus());
+            if(status.equals("DEACTIVATED")) {
+                throw new Exception("Card is invalid");
+            }
+        }
         //3. number of books issued against the card is strictly less than max_allowed_books
         // If it fails: throw new Exception("Book limit has reached for this card");
+       if( card.getBooks().size() >= max_allowed_books ) {
+           throw new Exception("Book limit has reached for this card");
+       }
         //If the transaction is successful, save the transaction to the list of transactions and return the id
+        Transaction transaction = Transaction.builder().fineAmount(0).transactionStatus(TransactionStatus.SUCCESSFUL)
+                .book(book)
+                .card(card)
+                .transactionId(UUID.randomUUID().toString())
+                .isIssueOperation(true)
+                .build();
+
+       transactionRepository5.save(transaction); // saving it in the database table;
+        book.setAvailable(false); // occupying the book
+        bookRepository5.save(book);// saving the book details as occupiet or available=false
+
+        // a book has list of transaction, so i am adding the transaction to the list;
+        book.getTransactions().add(transaction);
 
         //Note that the error message should match exactly in all cases
 
-       return null; //return transactionId instead
+       return transaction.getTransactionId();//return transactionId instead
     }
 
     public Transaction returnBook(int cardId, int bookId) throws Exception{
@@ -54,10 +90,31 @@ public class TransactionService {
         Transaction transaction = transactions.get(transactions.size() - 1);
 
         //for the given transaction calculate the fine amount considering the book has been returned exactly when this function is called
-        //make the book available for other users
-        //make a new transaction for return book which contains the fine amount as well
+      //  Date before = transaction.getTransactionDate();
+       // Date before = (Date) transaction.getTransactionDate();
 
-        Transaction returnBookTransaction  = null;
-        return returnBookTransaction; //return the transaction after updating all details
+
+        //make a new transaction for return book which contains the fine amount as well
+        Transaction newTransaction = Transaction.builder().transactionId(UUID.randomUUID().toString())
+                .book(transaction.getBook())
+                .card(transaction.getCard())
+                .fineAmount(0)
+                .transactionStatus(TransactionStatus.SUCCESSFUL)
+                .isIssueOperation(false)
+                .build();
+
+
+
+      //  newTransaction.setFineAmount(fine);
+
+
+        transactionRepository5.save(newTransaction);
+
+        //make the book available for other users
+        Book b = transaction.getBook();
+        b.setAvailable(true);
+        bookRepository5.save(b);
+
+        return newTransaction; //return the transaction after updating all details
     }
 }

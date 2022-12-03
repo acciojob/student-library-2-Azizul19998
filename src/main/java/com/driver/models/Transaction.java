@@ -1,6 +1,7 @@
 package com.driver.models;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import lombok.*;
 import org.hibernate.annotations.CreationTimestamp;
 
 import javax.persistence.*;
@@ -8,6 +9,13 @@ import java.util.Date;
 import java.util.UUID;
 
 @Entity
+@Getter
+@Setter
+@Builder
+@ToString
+@AllArgsConstructor
+@NoArgsConstructor
+@Data
 public class Transaction {
 
     @Id
@@ -15,16 +23,6 @@ public class Transaction {
     private int id;
 
     private String transactionId = UUID.randomUUID().toString(); // externalId
-
-    @ManyToOne
-    @JoinColumn
-    @JsonIgnoreProperties("books")
-    private Card card;
-
-    @ManyToOne
-    @JoinColumn
-    @JsonIgnoreProperties("transactions")
-    private Book book;
 
     private int fineAmount;
 
@@ -36,5 +34,17 @@ public class Transaction {
 
     @CreationTimestamp
     private Date transactionDate;
+
+
+    @ManyToOne
+    @JoinColumn
+    @JsonIgnoreProperties("books")
+    private Card card;
+
+    @ManyToOne
+    @JoinColumn
+    @JsonIgnoreProperties("transactions")
+    private Book book;
+
 }
 
