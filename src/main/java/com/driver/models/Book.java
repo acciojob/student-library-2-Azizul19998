@@ -50,12 +50,12 @@ public class Book {
         this.genre = genre;
         this.available = available;
     }
-
-    public Book(String name, Genre genre, boolean available, Author author) {
-        this.name = name;
-        this.genre = genre;
-        this.available = available;
-        this.author = author;
-    }
+//
+//    public Book(String name, Genre genre, boolean available, Author author) {
+//        this.name = name;
+//        this.genre = genre;
+//        this.available = available;
+//        this.author = author;
+//    }
 }
 
