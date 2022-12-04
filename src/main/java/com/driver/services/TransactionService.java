@@ -1,9 +1,6 @@
 package com.driver.services;
 
-import com.driver.models.Book;
-import com.driver.models.Card;
-import com.driver.models.Transaction;
-import com.driver.models.TransactionStatus;
+import com.driver.models.*;
 import com.driver.repositories.BookRepository;
 import com.driver.repositories.CardRepository;
 import com.driver.repositories.TransactionRepository;
@@ -11,8 +8,11 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
+import java.time.LocalDate;
+import java.util.Date;
 
 import static java.time.temporal.ChronoUnit.DAYS;
 
@@ -50,36 +50,52 @@ public class TransactionService {
         }
         //2. card is present and activated
         // If it fails: throw new Exception("Card is invalid");
-        if(card==null) {
+        if(card==null || card.getCardStatus().equals(CardStatus.DEACTIVATED)) {
             throw new Exception("Card is invalid");
         }
-        if(card!=null) {
-            String status = String.valueOf(card.getCardStatus());
-            if(status.equals("DEACTIVATED")) {
-                throw new Exception("Card is invalid");
-            }
-        }
+//        if(card!=null) {
+//            String status = String.valueOf(card.getCardStatus());
+//            if(status.equals("DEACTIVATED")) {
+//                throw new Exception("Card is invalid");
+//            }
+//        }
         //3. number of books issued against the card is strictly less than max_allowed_books
         // If it fails: throw new Exception("Book limit has reached for this card");
        if( card.getBooks().size() >= max_allowed_books ) {
            throw new Exception("Book limit has reached for this card");
        }
+
+       book.setCard(card);
+       card.getBooks().add(book);
         //If the transaction is successful, save the transaction to the list of transactions and return the id
-        Transaction transaction = Transaction.builder().fineAmount(0).transactionStatus(TransactionStatus.SUCCESSFUL)
+        Transaction transaction = Transaction.builder()
+                .fineAmount(0)
+                .transactionStatus(TransactionStatus.SUCCESSFUL)
                 .book(book)
                 .card(card)
                 .transactionId(UUID.randomUUID().toString())
                 .isIssueOperation(true)
                 .build();
 
+        book.setAvailable(false);
+        if(book.getTransactions() == null) {
+            ArrayList<Transaction> transactions = new ArrayList<>();
+            transactions.add(transaction);
+            book.setTransactions(transactions);
+        }
+        else {
+            book.getTransactions().add(transaction);
+        }
+
        transactionRepository5.save(transaction); // saving it in the database table;
-        book.setAvailable(false); // occupying the book
-        book.setCard(card);// setting the card id for the issued book
+
+//        book.setAvailable(false); // occupying the book
+//        book.setCard(card);// setting the card id for the issued book
         bookRepository5.save(book);// saving the book details as occupiet or available=false
 
-        // a book has list of transaction, so i am adding the transaction to the list;
-        book.getTransactions().add(transaction);
-        card.getBooks().add(book);
+//        // a book has list of transaction, so i am adding the transaction to the list;
+//        book.getTransactions().add(transaction);
+//        card.getBooks().add(book);
 
         cardRepository5.save(card);
 
@@ -87,6 +103,10 @@ public class TransactionService {
 
        return transaction.getTransactionId();//return transactionId instead
     }
+
+
+
+
 
     public Transaction returnBook(int cardId, int bookId) throws Exception{
 
@@ -96,13 +116,27 @@ public class TransactionService {
         //for the given transaction calculate the fine amount considering the book has been returned exactly when this function is called
       //  Date before = transaction.getTransactionDate();
        // Date before = (Date) transaction.getTransactionDate();
+          Date present = transaction.getTransactionDate();
+            Date curr = new Date();
+            long timeDifference = curr.getTime() - present.getTime();
 
+            long daysDifference = (timeDifference / (1000 * 60 * 60 * 24)) % 365 ;
+
+            int fine =0;
+            if(daysDifference > getMax_allowed_days) {
+                int fineDays = (int) (getMax_allowed_days - daysDifference);
+                fine = -1 * fineDays * fine_per_day;
+            }
+
+        //make the book available for other users
+        Book b = transaction.getBook();
+        b.setAvailable(true);
 
         //make a new transaction for return book which contains the fine amount as well
         Transaction newTransaction = Transaction.builder().transactionId(UUID.randomUUID().toString())
                 .book(transaction.getBook())
                 .card(transaction.getCard())
-                .fineAmount(0)
+                .fineAmount(fine)
                 .transactionStatus(TransactionStatus.SUCCESSFUL)
                 .isIssueOperation(false)
                 .build();
@@ -114,9 +148,7 @@ public class TransactionService {
 
         transactionRepository5.save(newTransaction);
 
-        //make the book available for other users
-        Book b = transaction.getBook();
-        b.setAvailable(true);
+
         b.setCard(null);
         bookRepository5.save(b);
 

@@ -35,12 +35,13 @@ public class StudentService {
 
     public void createStudent(Student student){
         // creating a new card for the student by default
-        Card card = new Card();
-        card.setStudent(student);
-        cardRepository.save(card);
+//        Card card = new Card();
+//        card.setStudent(student);
+//        cardRepository.save(card);
 
-  // now link the card id to the student table;
-        student.setCard(card);
+        // I have written the login in card service for createandReturn
+        cardService.createAndReturn(student);
+
 
         studentRepository4.save(student);
     }
