@@ -45,7 +45,7 @@ public class TransactionService {
         //conditions required for successful transaction of issue book:
         //1. book is present and available
         // If it fails: throw new Exception("Book is either unavailable or not present");
-        if(book==null) {
+        if(book==null || !book.isAvailable()) {
             throw new Exception("Book is either unavailable or not present");
         }
         //2. card is present and activated
@@ -79,6 +79,9 @@ public class TransactionService {
 
         // a book has list of transaction, so i am adding the transaction to the list;
         book.getTransactions().add(transaction);
+        card.getBooks().add(book);
+
+        cardRepository5.save(card);
 
         //Note that the error message should match exactly in all cases
 
