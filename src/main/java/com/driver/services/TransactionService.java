@@ -65,8 +65,8 @@ public class TransactionService {
            throw new Exception("Book limit has reached for this card");
        }
 
-       book.setCard(card);
-       card.getBooks().add(book);
+        book.setCard(card);
+        card.getBooks().add(book);
         //If the transaction is successful, save the transaction to the list of transactions and return the id
         Transaction transaction = Transaction.builder()
                 .fineAmount(0)

@@ -31,7 +31,8 @@ public class BookController {
                                    @RequestParam(value = "author", required = false) String author)
     {
 
-        List<Book> bookList = bookService.getBooks(genre,available,author); //find the elements of the list by yourself
+        List<Book> bookList = null;
+                bookService.getBooks(genre,available,author); //find the elements of the list by yourself
 
         return new ResponseEntity<>(bookList, HttpStatus.OK);
 
