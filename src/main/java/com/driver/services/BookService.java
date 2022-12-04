@@ -35,46 +35,47 @@ public class BookService {
 
     public List<Book> getBooks(String genre, boolean available, String author){
 
-        List<Book> books = null; //find the elements of the list by yourself
+//        List<Book> books = null; //find the elements of the list by yourself
+//
+//        books.addAll(bookRepository2.findBooksByAuthor(author,available));
+//        books.addAll(bookRepository2.findBooksByGenre(genre,available));
+//        books.addAll(bookRepository2.findBooksByGenreAuthor(genre, author, available));
+//        books.addAll(bookRepository2.findByAvailability(available));
+//
+//
+//        return books;
 
-        books.addAll(bookRepository2.findBooksByAuthor(author,available));
-        books.addAll(bookRepository2.findBooksByGenre(genre,available));
-        books.addAll(bookRepository2.findBooksByGenreAuthor(genre, author, available));
-        books.addAll(bookRepository2.findByAvailability(available));
+        List<Book> books = new ArrayList<>();
+        if(available){
 
-
-        return books;
-
-//        List<Book> books = new ArrayList<>();
-//        if(available){
-//            if(genre != null && author != null){
-//                books.addAll(bookRepository2.findBooksByGenreAuthor(genre,author,true));
-//            }
-//            else if(genre != null && author == null){
-//                books.addAll(bookRepository2.findBooksByGenre(genre,true));
-//            }
-//            else if(genre == null && author != null){
-//                books.addAll(bookRepository2.findBooksByAuthor(author,true));
-//            }
-//            else {
-//                books.addAll(bookRepository2.findByAvailability(true));
-//            }
-//        }
-//        else{
-//            if(genre != null && author != null){
-//                books.addAll(bookRepository2.findBooksByGenreAuthor(genre,author,false));
-//            }
-//            else if(genre != null && author == null){
-//                books.addAll(bookRepository2.findBooksByGenre(genre,false));
-//            }
-//            else if(genre == null && author != null){
-//                books.addAll(bookRepository2.findBooksByAuthor(author,false));
-//            }
-//            else{
-//                books.addAll(bookRepository2.findByAvailability(false));
-//            }
-//        }
-//        return  books;
+            if(genre != null && author != null){
+                books.addAll(bookRepository2.findBooksByGenreAuthor(genre,author,true));
+            }
+            else if(genre != null && author == null){
+                books.addAll(bookRepository2.findBooksByGenre(genre,true));
+            }
+            else if(genre == null && author != null){
+                books.addAll(bookRepository2.findBooksByAuthor(author,true));
+            }
+            else {
+                books.addAll(bookRepository2.findByAvailability(true));
+            }
+        }
+        else{
+            if(genre != null && author != null){
+                books.addAll(bookRepository2.findBooksByGenreAuthor(genre,author,false));
+            }
+            else if(genre != null && author == null){
+                books.addAll(bookRepository2.findBooksByGenre(genre,false));
+            }
+            else if(genre == null && author != null){
+                books.addAll(bookRepository2.findBooksByAuthor(author,false));
+            }
+            else{
+                books.addAll(bookRepository2.findByAvailability(false));
+            }
+        }
+       return  books;
 
 
     }

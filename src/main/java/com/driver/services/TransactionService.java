@@ -11,7 +11,6 @@ import org.springframework.stereotype.Service;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
-import java.time.LocalDate;
 import java.util.Date;
 
 import static java.time.temporal.ChronoUnit.DAYS;
@@ -45,14 +44,21 @@ public class TransactionService {
         //conditions required for successful transaction of issue book:
         //1. book is present and available
         // If it fails: throw new Exception("Book is either unavailable or not present");
+        if(card==null || card.getCardStatus().equals(CardStatus.DEACTIVATED)) {
+            throw new Exception("Card is invalid");
+        }
+
+        // If it fails: throw new Exception("Book limit has reached for this card");
+         if( card.getBooks().size() >= max_allowed_books ) {
+            throw new Exception("Book limit has reached for this card");
+        }
+
         if(book==null || !book.isAvailable()) {
             throw new Exception("Book is either unavailable or not present");
         }
         //2. card is present and activated
         // If it fails: throw new Exception("Card is invalid");
-        if(card==null || card.getCardStatus().equals(CardStatus.DEACTIVATED)) {
-            throw new Exception("Card is invalid");
-        }
+
 //        if(card!=null) {
 //            String status = String.valueOf(card.getCardStatus());
 //            if(status.equals("DEACTIVATED")) {
@@ -60,10 +66,6 @@ public class TransactionService {
 //            }
 //        }
         //3. number of books issued against the card is strictly less than max_allowed_books
-        // If it fails: throw new Exception("Book limit has reached for this card");
-       if( card.getBooks().size() >= max_allowed_books ) {
-           throw new Exception("Book limit has reached for this card");
-       }
 
         book.setCard(card);
         card.getBooks().add(book);
@@ -117,13 +119,19 @@ public class TransactionService {
       //  Date before = transaction.getTransactionDate();
        // Date before = (Date) transaction.getTransactionDate();
           Date present = transaction.getTransactionDate();
+
+
             Date curr = new Date();
+
+
             long timeDifference = curr.getTime() - present.getTime();
 
             long daysDifference = (timeDifference / (1000 * 60 * 60 * 24)) % 365 ;
 
             int fine =0;
+
             if(daysDifference > getMax_allowed_days) {
+
                 int fineDays = (int) (getMax_allowed_days - daysDifference);
                 fine = -1 * fineDays * fine_per_day;
             }
@@ -140,11 +148,6 @@ public class TransactionService {
                 .transactionStatus(TransactionStatus.SUCCESSFUL)
                 .isIssueOperation(false)
                 .build();
-
-
-
-      //  newTransaction.setFineAmount(fine);
-
 
         transactionRepository5.save(newTransaction);
 
