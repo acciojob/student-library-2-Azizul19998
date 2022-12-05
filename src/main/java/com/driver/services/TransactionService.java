@@ -157,6 +157,7 @@ public class TransactionService {
         b.setCard(null);
         bookRepository5.save(b);
 
-        return newTransaction; //return the transaction after updating all details
+        return null;
+      //  return newTransaction; //return the transaction after updating all details
     }
 }
