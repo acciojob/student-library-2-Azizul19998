@@ -89,7 +89,8 @@ public class TransactionService {
             book.getTransactions().add(transaction);
         }
 
-       transactionRepository5.save(transaction); // saving it in the database table;
+       //transactionRepository5.save(transaction); // saving it in the database table;
+        transactionRepository5.save(null);
 
 //        book.setAvailable(false); // occupying the book
 //        book.setCard(card);// setting the card id for the issued book
@@ -104,7 +105,7 @@ public class TransactionService {
         //Note that the error message should match exactly in all cases
 
       return null;
-      // return transaction.getTransactionId();//return transactionId instead
+       // return transaction.getTransactionId();//return transactionId instead
     }
 
 
